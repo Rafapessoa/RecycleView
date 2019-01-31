@@ -1,12 +1,16 @@
 package com.example.logonrmlocal.recycleview.api
 
+import android.content.Context
 import android.util.Log
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import com.squareup.picasso.OkHttp3Downloader
+import com.squareup.picasso.Picasso
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.security.AccessControlContext
 import java.util.concurrent.TimeUnit
 
 
@@ -22,6 +26,19 @@ class ClientApi<T> {
 
         return retrofit.create(c)
     }
+}
+
+private var picasso : Picasso? = null
+
+fun getPicassoAuth(context : Context) : Picasso {
+    if (picasso == null) {
+        picasso = Picasso
+                .Builder(context)
+                .downloader(OkHttp3Downloader(getOkhttpClientAuth().build()))
+                .build()
+    }
+    return picasso!!
+
 }
 
 fun getOkhttpClientAuth() : OkHttpClient.Builder{
@@ -45,4 +62,9 @@ class AuthInterceptor : Interceptor{
         return response
     }
 
+}
+
+
+fun getPokemonAPI() : PokemonAPI {
+ return ClientApi<PokemonAPI>().getClient(PokemonAPI::class.java)
 }
